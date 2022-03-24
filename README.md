@@ -21,11 +21,11 @@ Keychain support
 
 ## Getting started
 
-`$ yarn add react-native-rsa-native`
+`$ yarn add @iphuongtt/react-native-rsa-native`
 
 or:
 
-`$ npm install react-native-rsa-native --save`
+`$ npm install @iphuongtt/react-native-rsa-native --save`
 
 ## Older React-Native versions
 If you are using an older version of React Native and are having issues try using v1.1.14
@@ -43,7 +43,7 @@ Encrypt a message and subsequently decrypt it,
 using the RSA class in a promise chain structure.
 
 ```js
-import { RSA } from 'react-native-rsa-native';
+import { RSA } from '@iphuongtt/react-native-rsa-native';
 
 let message = "my secret message";
 
@@ -68,7 +68,7 @@ Sign a message and subsequently verify it,
 using the RSAKeychain class in an async/await structure.
 
 ```typescript
-import { RSAKeychain } from 'react-native-rsa-native';
+import { RSAKeychain } from '@iphuongtt/react-native-rsa-native';
 
 async main() {
     let keyTag = 'com.domain.mykey';
