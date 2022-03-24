@@ -1,4 +1,4 @@
-declare module 'react-native-rsa-native' {
+declare module '@iphuongtt/react-native-rsa-native' {
 	interface PublicKey {
 		public: string;
 	}
