@@ -56,8 +56,9 @@ public class RNRSAModule extends ReactContextBaseJavaModule {
         try {
           RSA rsa = new RSA();
           rsa.generate(keySize);
-          keys.putString("public", rsa.getPublicKey());
-          keys.putString("private", rsa.getPrivateKey());
+          keys.putString("publicKey", rsa.getPublicKey());
+          keys.putString("privateKey", rsa.getPrivateKey());
+          keys.putString("publicKeyPKCS8", rsa.getPublicKeyPkcs8());
           promise.resolve(keys);
         } catch (NoSuchAlgorithmException e) {
           promise.reject("Error", e.getMessage());
@@ -157,7 +158,8 @@ public class RNRSAModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void signWithAlgorithm(final String message, final String privateKeyString, final String algorithm, final Promise promise) {
+  public void signWithAlgorithm(final String message, final String privateKeyString, final String algorithm,
+      final Promise promise) {
     AsyncTask.execute(new Runnable() {
       @Override
       public void run() {
@@ -193,7 +195,27 @@ public class RNRSAModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void sign64WithAlgorithm(final String message, final String privateKeyString, final String algorithm, final Promise promise) {
+  public void signPSS64(final String message, final String hashName, final String privateKeyString,
+      final Promise promise) {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          RSA rsa = new RSA();
+          rsa.setPrivateKey(privateKeyString);
+          String signature = rsa.signPSS64(message, hashName);
+          promise.resolve(signature);
+
+        } catch (Exception e) {
+          promise.reject("Error", e.getMessage());
+        }
+      }
+    });
+  }
+
+  @ReactMethod
+  public void sign64WithAlgorithm(final String message, final String privateKeyString, final String algorithm,
+      final Promise promise) {
     AsyncTask.execute(new Runnable() {
       @Override
       public void run() {
@@ -230,7 +252,8 @@ public class RNRSAModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void verifyWithAlgorithm(final String signature, final String message, final String publicKeyString, final String algorithm,
+  public void verifyWithAlgorithm(final String signature, final String message, final String publicKeyString,
+      final String algorithm,
       final Promise promise) {
     AsyncTask.execute(new Runnable() {
       @Override
@@ -268,7 +291,8 @@ public class RNRSAModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void verify64WithAlgorithm(final String signature, final String message, final String publicKeyString, final String algorithm,
+  public void verify64WithAlgorithm(final String signature, final String message, final String publicKeyString,
+      final String algorithm,
       final Promise promise) {
     AsyncTask.execute(new Runnable() {
       @Override

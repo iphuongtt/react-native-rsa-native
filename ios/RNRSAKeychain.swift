@@ -39,7 +39,9 @@ class RNRSAKeychain: NSObject {
         let res = rsa_ec.generate(keySize: 2048)
         if(res ?? false){
             let pub = rsa_ec.encodedPublicKeyDER()
-            let keys = ["public": pub]
+            let pubPKCS8 = RSAECFormatter.stripHeaders(pemString: pub!)
+            let pubPKCS8Trimed = pubPKCS8!.components(separatedBy: .whitespacesAndNewlines).joined()
+            let keys = ["publicKey": pub, "publicKeyPKCS8": pubPKCS8Trimed ]
             resolve(keys)
             return
         }
@@ -55,7 +57,9 @@ class RNRSAKeychain: NSObject {
         let res = rsa_ec.generate(keySize: keySize)
         if(res ?? false){
             let pub = rsa_ec.encodedPublicKeyDER()
-            let keys = ["public": pub]
+            let pubPKCS8 = RSAECFormatter.stripHeaders(pemString: pub!)
+            let pubPKCS8Trimed = pubPKCS8!.components(separatedBy: .whitespacesAndNewlines).joined()
+            let keys = ["publicKey": pub, "publicKeyPKCS8": pubPKCS8Trimed ]
             resolve(keys)
             return
         }
@@ -267,5 +271,17 @@ class RNRSAKeychain: NSObject {
         resolve(msg)
     }
     
+    @objc
+    func signPSS64(_ message: String, algorithmOID: String, keyTag: String, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) -> Void {
+        let rsa_ec = RSAECNative(keyTag: keyTag)
+        let signature = rsa_ec.signPSS64(b64message: message, algorithmOID: algorithmOID)
+        if(signature == nil){
+            reject("not sign it", "error", nil)
+        }else {
+            resolve(signature)
+        }
+    }
+    
 }
+
 

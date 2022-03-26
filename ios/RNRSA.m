@@ -42,8 +42,10 @@ RCT_EXTERN_METHOD(decrypt64:(NSString *)message withKey:(NSString *)withKey reso
 
 RCT_EXTERN_METHOD(encrypt64:(NSString *)message withKey:(NSString *)withKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(signPSS64:(NSString *)message algorithmOID:(NSString *)algorithmOID withKey:(NSString *)withKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
 @end
+
 
 
 

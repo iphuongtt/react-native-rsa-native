@@ -19,6 +19,7 @@ class RSAECNative: NSObject {
     let privateKeyTag: String?
     var publicKeyBits: Data?
     var keyAlgorithm = KeyAlgorithm.rsa(signatureType: .sha512)
+    var secKeyAlgorithm: SecKeyAlgorithm = .rsaSignatureDigestPSSSHA256
     
     public init(keyTag: String?){
         self.publicKeyTag = "\(keyTag ?? "").public"
@@ -401,6 +402,12 @@ class RSAECNative: NSObject {
         let encodedSignature = self._sign(messageBytes: data, withAlgorithm: withAlgorithm, withEncodeOption: .lineLength64Characters)
         return encodedSignature
     }
+
+    public func signPSS64(b64message: String, algorithmOID: String) -> String? {
+        guard let data = Data(base64Encoded: b64message, options: .ignoreUnknownCharacters) else { return nil }
+        let encodedSignature = self._signPSS(messageBytes: data, algorithmOID: algorithmOID, withEncodeOption: .lineLength64Characters)
+        return encodedSignature
+    }
     
     public func sign(message: String, withAlgorithm: String, withEncodeOption: NSData.Base64EncodingOptions) -> String? {
         guard let data =  message.data(using: .utf8) else { return nil }
@@ -485,6 +492,30 @@ class RSAECNative: NSObject {
             signer(self.privateKey!);
         }
         
+        return encodedSignature
+    }
+
+    private func _signPSS(messageBytes: Data, algorithmOID: String, withEncodeOption: NSData.Base64EncodingOptions) -> String? {
+        self.setSecKeyAlgorithm(algorithmOID: algorithmOID)
+        var encodedSignature: String?
+        let signer: SecKeyPerformBlock = { privateKey in
+            guard #available(iOS 11, *) else {
+                print("Error signing: ios version lower IOS 11")
+                return
+            }
+            var error: Unmanaged<CFError>?
+            
+            let signature = SecKeyCreateSignature(privateKey, self.secKeyAlgorithm, messageBytes as CFData, &error)! as Data?
+            if error != nil{
+                print("Error in creating signature: \(error!.takeRetainedValue())")
+            }
+            encodedSignature = signature!.base64EncodedString(options: withEncodeOption)
+        }
+        if ((self.keyTag) != nil) {
+            self.performWithPrivateKeyTag(keyTag: self.privateKeyTag!, block: signer)
+        } else {
+            signer(self.privateKey!);
+        }
         return encodedSignature
     }
     
@@ -608,5 +639,25 @@ class RSAECNative: NSObject {
         return keyData;
     }
     
+    private func setSecKeyAlgorithm(algorithmOID: String) -> Void {
+        switch algorithmOID {
+        case "2.16.840.1.101.3.4.2.1":
+            self.secKeyAlgorithm = .rsaSignatureDigestPSSSHA256
+        case "2.16.840.1.101.3.4.2.2":
+            self.secKeyAlgorithm = .rsaSignatureDigestPSSSHA384
+        case "2.16.840.1.101.3.4.2.3":
+            self.secKeyAlgorithm = .rsaSignatureDigestPSSSHA512
+        case "2.16.840.1.101.3.4.2.8":
+            self.secKeyAlgorithm = .rsaSignatureDigestPKCS1v15SHA256
+        case "2.16.840.1.101.3.4.2.9":
+            self.secKeyAlgorithm = .rsaSignatureDigestPKCS1v15SHA384
+        case "2.16.840.1.101.3.4.2.10":
+            self.secKeyAlgorithm = .rsaSignatureDigestPKCS1v15SHA512
+        default:
+            self.secKeyAlgorithm = .rsaSignatureDigestPSSSHA256
+        }
+    }
+    
 }
+
 

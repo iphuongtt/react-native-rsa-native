@@ -1,6 +1,7 @@
 declare module '@iphuongtt/react-native-rsa-native' {
 	interface PublicKey {
-		public: string;
+		publicKey: string;
+		publicKeyPKCS8: string;
 	}
 
 	interface CSRKey {
@@ -8,17 +9,23 @@ declare module '@iphuongtt/react-native-rsa-native' {
 	}
 
 	interface KeyPair extends PublicKey {
-		private: string;
+		privateKey: string;
 	}
 
-	type TypeCrypto  = 
-		'SHA256withRSA'|
-		'SHA512withRSA'|
-		'SHA1withRSA'|
-		'SHA256withECDSA'|
-		'SHA512withECDSA'|
+	type TypeCrypto =
+		'SHA256withRSA' |
+		'SHA512withRSA' |
+		'SHA1withRSA' |
+		'SHA256withECDSA' |
+		'SHA512withECDSA' |
 		'SHA1withECDSA'
-	
+
+	type HashName =
+		'SHA1' |
+		'SHA224' |
+		'SHA256' |
+		'SHA384' |
+		'SHA512'
 
 	namespace RSA {
 		export function generate(): Promise<PublicKey>;
@@ -30,6 +37,7 @@ declare module '@iphuongtt/react-native-rsa-native' {
 		export function sign(data: string, key: string): Promise<string>;
 		export function signWithAlgorithm(data: string, key: string, signature?: TypeCrypto): Promise<string>;
 		export function sign64(data: string, key: string): Promise<string>;
+		export function signPSS64(data: string, hashName: HashName, key: string): Promise<string>;
 		export function sign64WithAlgorithm(data: string, key: string, signature?: TypeCrypto): Promise<string>;
 		export function verify(data: string, secretToVerify: string, key: string): Promise<boolean>;
 		export function verifyWithAlgorithm(data: string, secretToVerify: string, key: string, signature?: TypeCrypto): Promise<boolean>;
@@ -48,13 +56,14 @@ declare module '@iphuongtt/react-native-rsa-native' {
 		export function generateEC(keyTag: string): Promise<PublicKey>;
 		export function generateCSR(keyTag: string, CN: string, signature?: TypeCrypto): Promise<CSRKey>;
 		export function generateKeys(keyTag: string, keySize: number): Promise<PublicKey>;
-		export function generateCSRWithEC(cn: String,keyTag: string, keySize: number): Promise<PublicKey & CSRKey>;
+		export function generateCSRWithEC(cn: String, keyTag: string, keySize: number): Promise<PublicKey & CSRKey>;
 		export function deletePrivateKey(keyTag: string): Promise<boolean>;
 		export function encrypt(data: string, keyTag: string): Promise<string>;
 		export function decrypt(data: string, keyTag: string): Promise<string>;
 		export function encrypt64(data: string, keyTag: string): Promise<string>;
 		export function decrypt64(data: string, keyTag: string): Promise<string>;
 		export function sign(data: string, keyTag: string): Promise<string>;
+		export function signPSS64(data: string, hashName: HashName, keyTag: string): Promise<string>;
 		export function signWithAlgorithm(data: string, keyTag: string, signature?: TypeCrypto): Promise<string>;
 		export function sign64WithAlgorithm(data: string, keyTag: string, signature?: TypeCrypto): Promise<string>;
 		export function verify(data: string, secretToVerify: string, keyTag: string): Promise<boolean>;

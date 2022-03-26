@@ -59,7 +59,8 @@ public class RNRSAKeychainModule extends ReactContextBaseJavaModule {
         try {
           RSA rsa = new RSA();
           rsa.generate(keyTag, keySize, reactContext);
-          keys.putString("public", rsa.getPublicKey());
+          keys.putString("publicKey", rsa.getPublicKey());
+          keys.putString("publicKeyPKCS8", rsa.getPublicKeyPkcs8());
           promise.resolve(keys);
         } catch (NoSuchAlgorithmException e) {
           promise.reject("Error", e.getMessage());
@@ -250,6 +251,24 @@ public class RNRSAKeychainModule extends ReactContextBaseJavaModule {
       }
     });
   }
+
+  @ReactMethod
+  public void signPSS64(final String message, final String hashName, final String keyTag, final Promise promise) {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          RSA rsa = new RSA(keyTag);
+          String signature = rsa.signPSS64(message, hashName);
+          promise.resolve(signature);
+
+        } catch (Exception e) {
+          promise.reject("Error", e.getMessage());
+        }
+      }
+    });
+  }
+
   @ReactMethod
   public void sign64WithAlgorithm(final String message, final String keyTag, final String algorithm, final Promise promise) {
     AsyncTask.execute(new Runnable() {

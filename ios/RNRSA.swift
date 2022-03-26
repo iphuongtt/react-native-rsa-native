@@ -37,7 +37,7 @@ class RNRSA: NSObject {
     func generate(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) -> Void {
         self.generateKeys(2048, resolver: resolve, rejecter: reject)
     }
-    
+
     // generate key with keysize - RSA - DER format
     @objc
     func generateKeys(_ keySize: Int, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) -> Void {
@@ -46,7 +46,9 @@ class RNRSA: NSObject {
         if(res ?? false){
             let pub = rsa_ec.encodedPublicKeyDER()
             let prv = rsa_ec.encodedPrivateKeyRSA()
-            let keys = ["public": pub, "private": prv]
+            let pubPKCS8 = RSAECFormatter.stripHeaders(pemString: pub!)
+            let pubPKCS8Trimed = pubPKCS8!.components(separatedBy: .whitespacesAndNewlines).joined()
+            let keys = ["publicKey": pub, "privateKey": prv, "publicKeyPKCS8": pubPKCS8Trimed ]
             resolve(keys)
             return
         }
@@ -222,14 +224,20 @@ class RNRSA: NSObject {
         }
     }
     
+    @objc
+    func signPSS64(_ message: String, algorithmOID: String, withKey: String, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) -> Void {
+        let rsa_ec = RSAECNative()
+        guard let _ = rsa_ec.setPrivateKey(privateKey: withKey) else {
+            resolve(withKey)
+            return
+        }
+        let signature = rsa_ec.signPSS64(b64message: message, algorithmOID: algorithmOID)
+        if(signature == nil){
+            reject("not sign it", "error", nil)
+        }else {
+            resolve(signature)
+        }
+    }
+    
 }
-
-
-
-
-
-
-
-
-
 
