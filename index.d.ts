@@ -20,12 +20,12 @@ declare module '@iphuongtt/react-native-rsa-native' {
 		'SHA512withECDSA' |
 		'SHA1withECDSA'
 
-	type HashName =
-		'SHA1' |
-		'SHA224' |
-		'SHA256' |
-		'SHA384' |
-		'SHA512'
+	export type HashOID =
+		'1.3.14.3.2.26' |
+		'2.16.840.1.101.3.4.2.4' |
+		'2.16.840.1.101.3.4.2.1' |
+		'2.16.840.1.101.3.4.2.2' |
+		'2.16.840.1.101.3.4.2.3'
 
 	namespace RSA {
 		export function generate(): Promise<PublicKey>;
@@ -37,7 +37,7 @@ declare module '@iphuongtt/react-native-rsa-native' {
 		export function sign(data: string, key: string): Promise<string>;
 		export function signWithAlgorithm(data: string, key: string, signature?: TypeCrypto): Promise<string>;
 		export function sign64(data: string, key: string): Promise<string>;
-		export function signPSS64(data: string, hashName: HashName, key: string): Promise<string>;
+		export function signPSS64(data: string, hashOID: HashOID, key: string): Promise<string>;
 		export function sign64WithAlgorithm(data: string, key: string, signature?: TypeCrypto): Promise<string>;
 		export function verify(data: string, secretToVerify: string, key: string): Promise<boolean>;
 		export function verifyWithAlgorithm(data: string, secretToVerify: string, key: string, signature?: TypeCrypto): Promise<boolean>;
@@ -63,7 +63,7 @@ declare module '@iphuongtt/react-native-rsa-native' {
 		export function encrypt64(data: string, keyTag: string): Promise<string>;
 		export function decrypt64(data: string, keyTag: string): Promise<string>;
 		export function sign(data: string, keyTag: string): Promise<string>;
-		export function signPSS64(data: string, hashName: HashName, keyTag: string): Promise<string>;
+		export function signPSS64(data: string, hashOID: HashOID, keyTag: string): Promise<string>;
 		export function signWithAlgorithm(data: string, keyTag: string, signature?: TypeCrypto): Promise<string>;
 		export function sign64WithAlgorithm(data: string, keyTag: string, signature?: TypeCrypto): Promise<string>;
 		export function verify(data: string, secretToVerify: string, keyTag: string): Promise<boolean>;

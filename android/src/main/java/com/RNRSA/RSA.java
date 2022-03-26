@@ -87,6 +87,12 @@ public class RSA {
     private PrivateKey privateKey;
     private PKCS10CertificationRequest csr;
 
+    private static final String OID_SHA1 = "1.3.14.3.2.26";
+    private static final String OID_SHA224 = "2.16.840.1.101.3.4.2.4";
+    private static final String OID_SHA256 = "2.16.840.1.101.3.4.2.1";
+    private static final String OID_SHA384 = "2.16.840.1.101.3.4.2.2";
+    private static final String OID_SHA512 = "2.16.840.1.101.3.4.2.3";
+
     public RSA() {
         this.setupCharset();
     }
@@ -192,11 +198,35 @@ public class RSA {
         return Base64.encodeToString(signature, Base64.DEFAULT);
     }
 
-    private String signPSS(byte[] messageBytes, String hashName)
+    private String signPSS(byte[] messageBytes, String hashOID)
             throws NoSuchAlgorithmException, InvalidKeySpecException, IllegalBlockSizeException, BadPaddingException,
             NoSuchPaddingException, InvalidKeyException, SignatureException, NoSuchProviderException,
             InvalidAlgorithmParameterException {
-
+            String hashName;
+            if (null == hashOID) {
+                throw new NoSuchAlgorithmException("Not support hash-OID: " + hashOID);
+            } else {
+                switch (hashOID) {
+                    case OID_SHA1:
+                        hashName = "SHA1";
+                        break;
+                    case OID_SHA224:
+                        hashName = "SHA224";
+                        break;
+                    case OID_SHA256:
+                        hashName = "SHA256";
+                        break;
+                    case OID_SHA384:
+                        hashName = "SHA384";
+                        break;
+                    case OID_SHA512:
+                        hashName = "SHA512";
+                        break;
+                    default:
+                        throw new NoSuchAlgorithmException("Not support hash-OID: " + hashOID);
+                }
+            }
+            
         Security.insertProviderAt(new BouncyCastleProvider(), 1);
         final String MGF1 = "MGF1";
         final String RAWRSASSA_PSS = "NONEWITHRSASSA-PSS";
